@@ -11,17 +11,16 @@ namespace ConsoleApplication
         [DllImport("User32", CharSet = CharSet.Ansi)]
         public static extern int SystemParametersInfo(int uiAction, int uiParam, string pvParam, uint fWinIni);
 
-
         public static void Main(string[] args)
         {
-            var client = new HttpClient();
+            var httpClient = new HttpClient();
 
-            var response = client.GetStringAsync("http://www.nationalgeographic.com/photography/photo-of-the-day/").Result;
-            var regex = new Regex("'aemLeadImage'\\: '(?<url>.*?)'");
-            var match = regex.Match(response);
-            var url = match.Groups["url"].Value;
+            var response = httpClient.GetStringAsync("http://www.nationalgeographic.com/photography/photo-of-the-day/").Result;
+            var imageUrlRegex = new Regex("'aemLeadImage'\\: '(?<url>.*?)'");
+            var match = imageUrlRegex.Match(response);
+            var imageUrl = match.Groups["url"].Value;
 
-            var responseBytes = client.GetByteArrayAsync(url).Result;
+            var imageBytes = httpClient.GetByteArrayAsync(imageUrl).Result;
 
             var storageDirectory = "pictures";
             var storagePath = Path.Combine(storageDirectory, "picture-of-the-day");
@@ -31,7 +30,7 @@ namespace ConsoleApplication
                 Directory.CreateDirectory(storageDirectory);
             }
 
-            File.WriteAllBytes(storagePath, responseBytes);
+            File.WriteAllBytes(storagePath, imageBytes);
 
             var fileInfo = new FileInfo(storagePath);
 
