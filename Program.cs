@@ -23,14 +23,17 @@ namespace ConsoleApplication
 
             var responseBytes = client.GetByteArrayAsync(url).Result;
 
-            if (!Directory.Exists("pictures"))
+            var storageDirectory = "pictures";
+            var storagePath = Path.Combine(storageDirectory, "picture-of-the-day");
+
+            if (!Directory.Exists(storageDirectory))
             {
-                Directory.CreateDirectory("pictures");
+                Directory.CreateDirectory(storageDirectory);
             }
 
-            File.WriteAllBytes("pictures\\picture-of-the-day.jpg", responseBytes);
+            File.WriteAllBytes(storagePath, responseBytes);
 
-            var fileInfo = new FileInfo("pictures\\picture-of-the-day.jpg");
+            var fileInfo = new FileInfo(storagePath);
 
             SystemParametersInfo(0x0014, 0, fileInfo.FullName, 0x0001);
         }
