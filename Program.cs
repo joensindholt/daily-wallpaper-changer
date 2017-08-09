@@ -3,8 +3,9 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace ConsoleApplication
+namespace DailyWallpaperChanger
 {
     public class Program
     {
@@ -13,14 +14,13 @@ namespace ConsoleApplication
 
         public static void Main(string[] args)
         {
-            var httpClient = new HttpClient();
+            MainAsync(args).Wait();
+        }
 
-            var response = httpClient.GetStringAsync("http://www.nationalgeographic.com/photography/photo-of-the-day/").Result;
-            var imageUrlRegex = new Regex("'aemLeadImage'\\: '(?<url>.*?)'");
-            var match = imageUrlRegex.Match(response);
-            var imageUrl = match.Groups["url"].Value;
-
-            var imageBytes = httpClient.GetByteArrayAsync(imageUrl).Result;
+        public static async Task MainAsync(string[] args)
+        {
+            IWallpaperSource source = new Sources.ChromecastBackgrounds();
+            byte[] imageBytes = await source.GetRandomImageAsync();
 
             var storageDirectory = "pictures";
             var storagePath = Path.Combine(storageDirectory, "picture-of-the-day");
